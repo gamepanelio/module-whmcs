@@ -1,0 +1,13 @@
+{
+    "name": "gamepanelio/whmcs-provisioning-module",
+    "description": "A WHMCS provisioning module for GamePanel.io",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "CraftSRV Ltd.",
+            "email": "devs@craftsrv.com"
+        }
+    ],
+    "require": {}
+}
