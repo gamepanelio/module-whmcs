@@ -99,6 +99,59 @@ function gamepanelio_getModuleOptions($params)
 }
 
 /**
+ * Setup the required database column to store the server ID in
+ */
+function gamepanelio_checkUpdateDatabase()
+{
+    // Use full_query() for maximum compatibility
+    $tableExists = full_query("SHOW COLUMNS FROM `tblhosting` LIKE 'gamepanelioid'");
+
+    if (mysql_num_rows($tableExists) == 0) {
+        full_query("ALTER TABLE `tblhosting` ADD `gamepanelioid` VARCHAR(21) NOT NULL;");
+    }
+}
+
+/**
+ * @param string|int $serviceId
+ * @return string
+ */
+function gamepanelio_findServerIdForService($serviceId)
+{
+    $result = select_query(
+        "tblhosting",
+        "gamepanelioid",
+        [
+            "id" => $serviceId
+        ]
+    );
+
+    if (mysql_num_rows($result) > 0) {
+        $result = mysql_fetch_array($result);
+
+        return $result['gamepanelioid'];
+    }
+
+    return null;
+}
+
+/**
+ * @param string|int $serviceId
+ * @return string
+ */
+function gamepanelio_setServerIdForService($serviceId, $newServerId)
+{
+    update_query(
+        "tblhosting",
+        [
+            "gamepanelioid" => $newServerId
+        ],
+        [
+            "id" => $serviceId
+        ]
+    );
+}
+
+/**
  * Provision a new instance of a product/service.
  *
  * Attempt to provision a new instance of a given product/service. This is
@@ -150,6 +203,8 @@ function gamepanelio_CreateAccount(array $params)
  */
 function gamepanelio_SuspendAccount(array $params)
 {
+    gamepanelio_checkUpdateDatabase();
+
     try {
         // TODO: Suspend a server
         
@@ -184,6 +239,8 @@ function gamepanelio_SuspendAccount(array $params)
  */
 function gamepanelio_UnsuspendAccount(array $params)
 {
+    gamepanelio_checkUpdateDatabase();
+
     try {
         // TODO: Un-suspend a server
 
@@ -217,6 +274,8 @@ function gamepanelio_UnsuspendAccount(array $params)
  */
 function gamepanelio_TerminateAccount(array $params)
 {
+    gamepanelio_checkUpdateDatabase();
+
     try {
         // TODO: Terminate server
 
@@ -254,6 +313,8 @@ function gamepanelio_TerminateAccount(array $params)
  */
 function gamepanelio_ChangePassword(array $params)
 {
+    gamepanelio_checkUpdateDatabase();
+
     try {
         // TODO: Change user password
 
@@ -291,6 +352,8 @@ function gamepanelio_ChangePassword(array $params)
  */
 function gamepanelio_ChangePackage(array $params)
 {
+    gamepanelio_checkUpdateDatabase();
+
     try {
         // TODO: Change server plan
 
@@ -329,6 +392,8 @@ function gamepanelio_ChangePackage(array $params)
  */
 function gamepanelio_TestConnection(array $params)
 {
+    gamepanelio_checkUpdateDatabase();
+
     try {
         // TODO: Add connection test
         // Call the service's connection test function.
@@ -373,6 +438,8 @@ function gamepanelio_TestConnection(array $params)
  */
 function gamepanelio_AdminServicesTabFields(array $params)
 {
+    gamepanelio_checkUpdateDatabase();
+
     try {
         // Call the service's function, using the values provided by WHMCS in
         // `$params`.
@@ -415,6 +482,8 @@ function gamepanelio_AdminServicesTabFields(array $params)
  */
 function gamepanelio_AdminServicesTabFieldsSave(array $params)
 {
+    gamepanelio_checkUpdateDatabase();
+
     // TODO: Save any service changes
     // Fetch form submission variables.
     $originalFieldValue = isset($_REQUEST['gamepanelio_original_uniquefieldname'])
@@ -477,6 +546,8 @@ function gamepanelio_AdminServicesTabFieldsSave(array $params)
  */
 function gamepanelio_ClientArea(array $params)
 {
+    gamepanelio_checkUpdateDatabase();
+
     // TODO: Make a front-end for the users
     // Determine the requested action and set service call parameters based on
     // the action.
