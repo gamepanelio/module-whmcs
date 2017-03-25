@@ -171,7 +171,7 @@ function gamepanelio_CreateAccount(array $params)
 {
     try {
         // TODO: Create a server
-        
+
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
@@ -207,7 +207,7 @@ function gamepanelio_SuspendAccount(array $params)
 
     try {
         // TODO: Suspend a server
-        
+
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
@@ -441,14 +441,14 @@ function gamepanelio_AdminServicesTabFields(array $params)
     gamepanelio_checkUpdateDatabase();
 
     try {
-        // Call the service's function, using the values provided by WHMCS in
-        // `$params`.
-        $response = array();
+        $serviceId = $params["serviceid"];
+        $serverId = gamepanelio_findServerIdForService($serviceId);
 
-        // TODO: Add ability to edit associated service
-        // Return an array based on the function's response.
         return [
-            'Service ID' => "TODO"
+            'Server ID' => '<input type="hidden" name="gamepanelio_serverId_original" '
+                . 'value="' . htmlspecialchars($serverId) . '" />'
+                . '<input type="text" name="gamepanelio_serverId" '
+                . 'value="' . htmlspecialchars($serverId) . '" size="25" />',
         ];
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
@@ -461,9 +461,8 @@ function gamepanelio_AdminServicesTabFields(array $params)
         );
 
         // In an error condition, simply return no additional fields to display.
+        return [];
     }
-
-    return array();
 }
 
 /**
@@ -484,21 +483,19 @@ function gamepanelio_AdminServicesTabFieldsSave(array $params)
 {
     gamepanelio_checkUpdateDatabase();
 
-    // TODO: Save any service changes
     // Fetch form submission variables.
-    $originalFieldValue = isset($_REQUEST['gamepanelio_original_uniquefieldname'])
-        ? $_REQUEST['gamepanelio_original_uniquefieldname']
+    $originalFieldValue = isset($_REQUEST['gamepanelio_serverId_original'])
+        ? $_REQUEST['gamepanelio_serverId_original']
         : '';
 
-    $newFieldValue = isset($_REQUEST['gamepanelio_uniquefieldname'])
-        ? $_REQUEST['gamepanelio_uniquefieldname']
+    $newFieldValue = isset($_REQUEST['gamepanelio_serverId'])
+        ? $_REQUEST['gamepanelio_serverId']
         : '';
 
     // Look for a change in value to avoid making unnecessary service calls.
     if ($originalFieldValue != $newFieldValue) {
         try {
-            // Call the service's function, using the values provided by WHMCS
-            // in `$params`.
+            gamepanelio_setServerIdForService($params["serviceid"], $newFieldValue);
         } catch (Exception $e) {
             // Record the error in WHMCS's module log.
             logModuleCall(
@@ -509,7 +506,7 @@ function gamepanelio_AdminServicesTabFieldsSave(array $params)
                 $e->getTraceAsString()
             );
 
-            // Otherwise, error conditions are not supported in this operation.
+            // Error conditions are not supported in this operation.
         }
     }
 }
