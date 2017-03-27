@@ -61,7 +61,6 @@ function gamepanelio_ConfigOptions()
                 'auto' => 'Auto',
                 'dedicated' => 'Dedicated',
             ],
-            'Auto,Dedicated',
             'Default' => 'Auto',
         ],
         'gpio_usernamePrefix' => [
@@ -96,6 +95,17 @@ function gamepanelio_getModuleOptions($params)
         'usernamePrefix' => $params["configoption3"],
         'game' => $params["configoption4"]
     ];
+}
+
+/**
+ * @param $params
+ * @return \GamePanelio\GamePanelio
+ */
+function gamepanelio_getApiClient($params)
+{
+    $accessToken = new \GamePanelio\AccessToken\PersonalAccessToken($params['serveraccesshash']);
+
+    return new \GamePanelio\GamePanelio($params['serverhostname'], $accessToken);
 }
 
 /**
@@ -169,9 +179,55 @@ function gamepanelio_setServerIdForService($serviceId, $newServerId)
  */
 function gamepanelio_CreateAccount(array $params)
 {
-    try {
-        // TODO: Create a server
+    gamepanelio_checkUpdateDatabase();
 
+    try {
+        $apiClient = gamepanelio_getApiClient($params);
+        $moduleOptions = gamepanelio_getModuleOptions($params);
+
+        $serviceId = $params['serviceid'];
+        $clientDetails = $params['clientsdetails'];
+        $serviceUsername = $moduleOptions['userprefix'] . $clientDetails['firstname'] . $clientDetails['lastname'] . $clientDetails['id'];
+        $servicePassword = $params['password'];
+        $gpioUserId = null;
+
+        try {
+            $response = $apiClient->getUserByUsername($serviceUsername);
+        } catch (\GamePanelio\Exception\ApiCommunicationException $e) {
+            $response = $apiClient->createUser([
+                'username' => $serviceUsername,
+                'password' => $servicePassword,
+                'email' => $clientDetails['email'],
+                'fullName' => $clientDetails['fullname'],
+            ]);
+        }
+
+        $gpioUserId = $response['id'];
+
+        update_query(
+            'tblhosting',
+            [
+                'username' => $serviceUsername
+            ],
+            [
+                'id' => $serviceId
+            ]
+        );
+
+        $serverName = $clientDetails['firstname'] . "'";
+        if (substr($clientDetails['firstname'], -1) != "s") {
+            $serverName .= "s";
+        }
+        $serverName .= " Game Server";
+
+        $serverResponse = $apiClient->createServer([
+            'name' => $serverName,
+            'user' => $gpioUserId,
+            'game' => $moduleOptions['game'],
+            'plan' => $moduleOptions['plan'],
+        ]);
+
+        gamepanelio_setServerIdForService($serviceId, $serverResponse['id']);
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
@@ -206,8 +262,16 @@ function gamepanelio_SuspendAccount(array $params)
     gamepanelio_checkUpdateDatabase();
 
     try {
-        // TODO: Suspend a server
+        $serviceId = $params['serviceid'];
+        $apiClient = gamepanelio_getApiClient($params);
+        $serverId = gamepanelio_findServerIdForService($serviceId);
 
+        $apiClient->updateServer(
+            $serverId,
+            [
+                'suspended' => true,
+            ]
+        );
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
@@ -242,8 +306,16 @@ function gamepanelio_UnsuspendAccount(array $params)
     gamepanelio_checkUpdateDatabase();
 
     try {
-        // TODO: Un-suspend a server
+        $serviceId = $params['serviceid'];
+        $apiClient = gamepanelio_getApiClient($params);
+        $serverId = gamepanelio_findServerIdForService($serviceId);
 
+        $apiClient->updateServer(
+            $serverId,
+            [
+                'suspended' => false,
+            ]
+        );
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
@@ -277,8 +349,11 @@ function gamepanelio_TerminateAccount(array $params)
     gamepanelio_checkUpdateDatabase();
 
     try {
-        // TODO: Terminate server
+        $serviceId = $params['serviceid'];
+        $apiClient = gamepanelio_getApiClient($params);
+        $serverId = gamepanelio_findServerIdForService($serviceId);
 
+        $apiClient->deleteServer($serverId);
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
@@ -316,8 +391,17 @@ function gamepanelio_ChangePassword(array $params)
     gamepanelio_checkUpdateDatabase();
 
     try {
-        // TODO: Change user password
+        $apiClient = gamepanelio_getApiClient($params);
 
+        $response = $apiClient->getUserByUsername($params['username']);
+        $gpioUserId = $response['id'];
+
+        $apiClient->updateUser(
+            $gpioUserId,
+            [
+                'password' => $params['password'],
+            ]
+        );
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
@@ -355,8 +439,18 @@ function gamepanelio_ChangePackage(array $params)
     gamepanelio_checkUpdateDatabase();
 
     try {
-        // TODO: Change server plan
+        $serviceId = $params['serviceid'];
+        $apiClient = gamepanelio_getApiClient($params);
+        $moduleOptions = gamepanelio_getModuleOptions($params);
+        $serverId = gamepanelio_findServerIdForService($serviceId);
 
+        $apiClient->updateServer(
+            $serverId,
+            [
+                'game' => $moduleOptions['game'],
+                'plan' => $moduleOptions['plan'],
+            ]
+        );
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(

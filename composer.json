@@ -9,5 +9,10 @@
             "email": "devs@craftsrv.com"
         }
     ],
-    "require": {}
+    "require": {
+        "gamepanelio/api": "dev-master",
+        "php-http/curl-client": "^1.7",
+        "guzzlehttp/psr7": "^1.4",
+        "php-http/message": "^1.5"
+    }
 }
