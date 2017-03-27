@@ -71,7 +71,7 @@ function gamepanelio_ConfigOptions()
         'gpio_game' => [
             'FriendlyName' => 'Game Type',
             'Type' => 'dropdown',
-            'Options' => json_decode(file_get_contents('games.json')),
+            'Options' => json_decode(file_get_contents(__DIR__ . '/games.json'), true),
         ],
     ];
 }
