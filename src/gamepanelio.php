@@ -489,8 +489,8 @@ function gamepanelio_TestConnection(array $params)
     gamepanelio_checkUpdateDatabase();
 
     try {
-        // TODO: Add connection test
-        // Call the service's connection test function.
+        $apiClient = gamepanelio_getApiClient($params);
+        $apiClient->getUser("me");
 
         $success = true;
         $errorMsg = '';
