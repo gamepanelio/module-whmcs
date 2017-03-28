@@ -95,7 +95,7 @@ function gamepanelio_getModuleOptions($params)
 
     return [
         'plan' => $params["configoption1"],
-        'allocation' => $allocation,
+        'allocation' => strtolower($allocation),
         'usernamePrefix' => $params["configoption3"],
         'game' => $params["configoption4"]
     ];
@@ -229,6 +229,7 @@ function gamepanelio_CreateAccount(array $params)
             'user' => $gpioUserId,
             'game' => $moduleOptions['game'],
             'plan' => $moduleOptions['plan'],
+            'allocation' => $moduleOptions['allocation'],
         ]);
 
         gamepanelio_setServerIdForService($serviceId, $serverResponse['id']);
