@@ -1,0 +1,12 @@
+GamePanel.io WHMCS Module
+=========================
+
+To install:
+
+ - Copy the entire gamepanelio directory to your modules/servers folder
+   (so it looks like modules/servers/gamepanelio/gamepanelio.php)
+
+ - Follow the documentation @ https://docs.gamepanel.io
+
+
+Please see the LICENSE file for legal stuff

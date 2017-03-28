@@ -4,6 +4,10 @@ if (!defined("WHMCS")) {
     die("This file cannot be accessed directly");
 }
 
+if (!class_exists("\\GamePanelio\\GamePanelio")) {
+    require_once "vendor/autoload.php";
+}
+
 /**
  * Define module related meta data.
  *
