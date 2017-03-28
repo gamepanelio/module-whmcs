@@ -191,7 +191,7 @@ function gamepanelio_CreateAccount(array $params)
 
         $serviceId = $params['serviceid'];
         $clientDetails = $params['clientsdetails'];
-        $serviceUsername = $moduleOptions['userprefix'] . $clientDetails['firstname'] . $clientDetails['lastname'] . $clientDetails['id'];
+        $serviceUsername = $moduleOptions['usernamePrefix'] . $clientDetails['firstname'] . $clientDetails['lastname'] . $clientDetails['id'];
         $servicePassword = $params['password'];
         $gpioUserId = null;
 
