@@ -10,7 +10,7 @@ This project uses [composer](https://getcomposer.org/) to manage it's dependenci
 
 WHMCS doesn't use composer to manage modules, so we pre-packed everything you need into one neat little zip file.
 
-1. Head to the [latest release](https://github.com/gamepanelio/api-php/releases/latest) and download the `gamepanelio.zip` file. 
+1. Head to the [latest release](https://github.com/gamepanelio/module-whmcs/releases/latest) and download the `gamepanelio.zip` file. 
 2. Unzip & follow the instructions supplied.
 
 ## Building
