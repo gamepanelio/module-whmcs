@@ -1,5 +1,5 @@
 {
-    "name": "gamepanelio/whmcs-provisioning-module",
+    "name": "gamepanelio/module-whmcs",
     "description": "A WHMCS provisioning module for GamePanel.io",
     "type": "library",
     "license": "MIT",
