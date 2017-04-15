@@ -28,6 +28,16 @@ If you want to build the module from the source and use it in WHMCS, we've suppl
    ```
 4. Unzip the `build/gamepanelio.zip` file and upload to your WHMCS
 
+## Tests
+
+This module has [PHPUnit](https://phpunit.de/) tests.
+
+After installing via composer, run them like so:
+
+```bash
+./vendor/bin/phpunit
+```
+
 ## License
 
 This module is licensed under the MIT license. See the `LICENSE` file for

@@ -107,6 +107,12 @@ function gamepanelio_getModuleOptions($params)
  */
 function gamepanelio_getApiClient($params)
 {
+    global $mockApiClient;
+
+    if (defined('WHMCS_TESTGATE') && $mockApiClient !== false) {
+        return $mockApiClient;
+    }
+
     $accessToken = new \GamePanelio\AccessToken\PersonalAccessToken($params['serveraccesshash']);
 
     return new \GamePanelio\GamePanelio($params['serverhostname'], $accessToken);
@@ -117,6 +123,10 @@ function gamepanelio_getApiClient($params)
  */
 function gamepanelio_checkUpdateDatabase()
 {
+    if (defined('WHMCS_TESTGATE')) {
+        return;
+    }
+
     // Use full_query() for maximum compatibility
     $tableExists = full_query("SHOW COLUMNS FROM `tblhosting` LIKE 'gamepanelioid'");
 
@@ -131,6 +141,10 @@ function gamepanelio_checkUpdateDatabase()
  */
 function gamepanelio_findServerIdForService($serviceId)
 {
+    if (defined('WHMCS_TESTGATE')) {
+        return 123;
+    }
+
     $result = select_query(
         "tblhosting",
         "gamepanelioid",
